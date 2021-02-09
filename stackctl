@@ -1,8 +1,8 @@
 #!/bin/bash
 # Docker stack admin tool. Updates available at https://github.com/stixes/stackctl
 
-if [ -f /etc/.stackctlrc ]; then
-  . /etc/.stackctlrc
+if [ -f /etc/stackctl ]; then
+  . /etc/stackctl
 fi
 if [ -f $HOME/.stackctlrc ]; then
   . $HOME/.stackctlrc
