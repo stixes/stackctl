@@ -23,6 +23,9 @@ The tool expects a compose type file named stack.yml to be present in the PWD. T
 
 The main script can be downloaded directly from github and placed in /usr/local/bin/ or however you prefer to install such utilities.
 
+    curl -o /tmp/stackctl https://raw.githubusercontent.com/stixes/stackctl/main/stackctl
+    sudo install /tmp/stackctl /usr/local/bin/
+
 ## Remote host and default environment
 
 If exists, stackctl will source configuration from /etc/stackctl and $HOME/.stackctlrc for both universal and per user setup. This allow you to set other environment variables, such as default secrets for use in stack.yml files and DOCKER\_HOST and associated variables for accessing a non-local docker swarm.
