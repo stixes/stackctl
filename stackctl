@@ -13,24 +13,6 @@ STACKDIR=${2:-$PWD}
 STACK=$(basename $STACKDIR)
 CMD=$1
 
-if [ ! -d "$STACKDIR" ]; then
-  echo "ERROR: No such dir: $STACKDIR!"
-  usage
-  exit 3;
-fi
-
-if [ ! -x "$(which docker-compose)" ]; then 
-  echo "ERROR: docker-compose is required for using this utility. Please install."
-  exit 4;
-fi
-
-cd $STACKDIR
-
-if [ ! -f "stack.yml" ]; then
-  echo "ERROR: No stack.yml file found in ${STACK}!"
-  exit 2;
-fi
-
 function usage() {
   echo "Docker-compose based stack admin:"
   echo " stackctl <cmd> <stackdir>"
@@ -65,6 +47,24 @@ function recreate() {
   docker stack services --format '{{ .Name }}' ${STACK} | \
     xargs -P 4 -n 1 -r docker service update --update-monitor 500ms --force --with-registry-auth
 }
+
+if [ ! -x "$(which docker-compose)" ]; then 
+  echo "ERROR: docker-compose is required for using this utility. Please install."
+  exit 4;
+fi
+
+if [ ! -d "$STACKDIR" ]; then
+  echo "ERROR: No such dir: $STACKDIR!"
+  exit 3;
+fi
+
+cd $STACKDIR
+
+if [ ! -f "stack.yml" ]; then
+  echo "ERROR: No stack.yml file found in ${STACK}!"
+  usage
+  exit 2;
+fi
 
 case "$CMD" in
   up) up ;;
