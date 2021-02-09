@@ -44,7 +44,7 @@ function down() {
 }
 
 function logs() {
-  docker service logs $(docker stack services --format '{{ .Name }}' ${STACK} |head -n 1) $@
+  docker service logs -f $(docker stack services --format '{{ .Name }}' ${STACK} |head -n 1)
 }
 
 function recreate() {
