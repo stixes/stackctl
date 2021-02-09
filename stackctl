@@ -1,4 +1,5 @@
 #!/bin/bash
+# Docker stack admin tool. Updates available at https://github.com/stixes/stackctl
 
 if [ -f /etc/.stackctlrc ]; then
   . /etc/.stackctlrc
@@ -14,6 +15,7 @@ CMD=$1
 
 if [ ! -d "$STACKDIR" ]; then
   echo "ERROR: No such dir: $STACKDIR!"
+  usage
   exit 3;
 fi
 
