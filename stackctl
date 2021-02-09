@@ -21,7 +21,7 @@ function usage() {
 }
 
 function pull() {
-  docker-compose -f stack.yml pull
+  docker-compose --log-level ERROR -f stack.yml pull
 }
 
 function status() {
@@ -41,6 +41,10 @@ function up() {
 function down() {
   echo "Destroying $STACK.."
   docker stack rm ${STACK}
+}
+
+function logs() {
+  docker service logs $(docker stack services --format '{{ .Name }}' ${STACK} |head -n 1) $@
 }
 
 function recreate() {
@@ -77,6 +81,7 @@ case "$CMD" in
   describe) config ;;
   pull) pull ;;
   recreate) recreate ;;
+  logs) logs ;;
   *) usage ;;
 esac
 
