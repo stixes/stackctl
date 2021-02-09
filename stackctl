@@ -1,0 +1,80 @@
+#!/bin/bash
+
+if [ -f /etc/.stackctlrc ]; then
+  . /etc/.stackctlrc
+fi
+if [ -f $HOME/.stackctlrc ]; then
+  . $HOME/.stackctlrc
+fi
+
+# Fix trailing / if using tab completion
+STACKDIR=${2:-$PWD}
+STACK=$(basename $STACKDIR)
+CMD=$1
+
+if [ ! -d "$STACKDIR" ]; then
+  echo "ERROR: No such dir: $STACKDIR!"
+  exit 3;
+fi
+
+if [ ! -x "$(which docker-compose)" ]; then 
+  echo "ERROR: docker-compose is required for using this utility. Please install."
+  exit 4;
+fi
+
+cd $STACKDIR
+
+if [ ! -f "stack.yml" ]; then
+  echo "ERROR: No stack.yml file found in ${STACK}!"
+  exit 2;
+fi
+
+function usage() {
+  echo "Docker-compose based stack admin:"
+  echo " stackctl <cmd> <stackdir>"
+  echo "<cmd> is a command from: up,down,status and recreate"
+  echo "Expects <stackdir> to contain stack.yml and any .env files needed."
+}
+
+function pull() {
+  docker-compose -f stack.yml pull
+}
+
+function status() {
+  docker stack ps --no-trunc ${STACK}
+}
+
+function config() {
+  docker-compose --log-level ERROR -f stack.yml config --resolve-image-digests 
+}
+
+function up() {
+  echo "Starting/updating $STACK.."
+  docker-compose --log-level ERROR -f stack.yml config --resolve-image-digests | \
+    docker stack deploy -c - --prune --with-registry-auth ${STACK}
+}
+
+function down() {
+  echo "Destroying $STACK.."
+  docker stack rm ${STACK}
+}
+
+function recreate() {
+  docker stack services --format '{{ .Name }}' ${STACK} | \
+    xargs -P 4 -n 1 -r docker service update --update-monitor 500ms --force --with-registry-auth
+}
+
+case "$CMD" in
+  up) up ;;
+  start) up ;;
+  down) down ;;
+  stop) stop ;;
+  status) status ;;
+  ps) status ;;
+  config) config ;;
+  describe) config ;;
+  pull) pull ;;
+  recreate) recreate ;;
+  *) usage ;;
+esac
+
